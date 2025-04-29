@@ -8,4 +8,4 @@ nltk
 joblib
 plotly
 wordcloud
-folium
+streamlit_folium
