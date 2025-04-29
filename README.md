@@ -159,3 +159,23 @@ Socioeconomic Data:
 - Suggest mobile application development for broader access
 - Outline potential for integration with early warning systems
 - Propose international collaboration opportunities
+
+
+
+
+## Student Contributions (Adrisha Ranjit)
+
+### Directory Structure
+- **Data/**: Contains raw and preprocessed datasets.
+- **Notebook/**: Jupyter notebooks for analysis and modeling.
+- **Rainfall_app/**: Streamlit app implementation.
+  - `App.py`: Main app file.
+  - `pages/`: Individual app pages.
+  - `utils/`: Utility scripts.
+
+### Setup Instructions
+1. Clone the repository and install dependencies using `requirements.txt`.
+2. Run the app with `streamlit run Rainfall_app/App.py`.
+
+### Usage
+- Navigate through the app’s pages (Home, Prediction, Regional Analysis, News Insights, Feedback).
