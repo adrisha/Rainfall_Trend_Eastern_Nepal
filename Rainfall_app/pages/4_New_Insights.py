@@ -1,9 +1,9 @@
-import streamlit as st
+import streamlit as st # type: ignore
 import pandas as pd
 import os
-from textblob import TextBlob
+from textblob import TextBlob # type: ignore
 from utils.data_utils import load_nlp_results, load_lda_topics
-import plotly.express as px
+import plotly.express as px # type: ignore
 
 # Set page configuration
 st.set_page_config(page_title="News Insights Dashboard", layout="centered", initial_sidebar_state="expanded")
@@ -106,7 +106,7 @@ with st.container():
     st.markdown("Explore NLP analysis results with sentiment distribution and topic modeling.")
 
 # File path
-nlp_file_path = 'data/nlp_results.csv'
+nlp_file_path = '../Rainfall_app/data/nlp_results.csv'
 
 # Check if file exists and load data
 if os.path.exists(nlp_file_path):

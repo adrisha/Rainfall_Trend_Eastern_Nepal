@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st # type: ignore
 import pandas as pd
 from utils.data_utils import load_feature_data, load_reg_model, load_clf_model
 from utils.visualization_utils import plot_time_series

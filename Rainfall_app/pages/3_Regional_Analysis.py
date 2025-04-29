@@ -1,7 +1,7 @@
-import streamlit as st
+import streamlit as st # type: ignore
 import pandas as pd
-import plotly.express as px
-from streamlit_folium import st_folium
+import plotly.express as px # type: ignore
+from streamlit_folium import st_folium # type: ignore
 from utils.visualization_utils import plot_station_map
 import folium
 
@@ -94,13 +94,13 @@ with st.container():
 
 # Load data functions
 def load_regional_performance_regression():
-    return pd.read_csv('../rainfall_app/data/regional_performance_regression.csv', index_col='station_id')
+    return pd.read_csv('../Rainfall_app/data/regional_performance_regression.csv', index_col='station_id')
 
 def load_regional_performance_classification():
-    return pd.read_csv('../rainfall_app/data/regional_performance_classification.csv', index_col='station_id')
+    return pd.read_csv('../Rainfall_app/data/regional_performance_classification.csv', index_col='station_id')
 
 def load_feature_data():
-    return pd.read_csv('../rainfall_app/data/feature_engineered_data.csv')
+    return pd.read_csv('../Rainfall_app/data/feature_engineered_data.csv')
 
 # Load performance data
 reg_perf = load_regional_performance_regression()
