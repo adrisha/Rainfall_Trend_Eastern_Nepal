@@ -5,10 +5,10 @@ def load_feature_data():
       return pd.read_csv('../Rainfall_app/data/feature_engineered_data.csv')
 
 def load_reg_model():
-      return pd.read_pickle('../Rainfall_app/models/best_random_forest_regressor_model.pkl')
+      return pd.read_pickle('../Rainfall_app/data/best_random_forest_regressor_model.pkl')
 
 def load_clf_model():
-      return pd.read_pickle('../Rainfall_app/models/best_random_forest_classifier_model.pkl')
+      return pd.read_pickle('../Rainfall_app/data/best_random_forest_classifier_model.pkl')
 
 def load_nlp_results():
       return pd.read_csv('../Rainfall_app/data/nlp_results.csv')
