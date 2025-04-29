@@ -1,9 +1,11 @@
-import streamlit as st # type: ignore
+import streamlit as st
 import pandas as pd
-import plotly.express as px # type: ignore
-from streamlit_folium import st_folium # type: ignore
+import plotly.express as px
+from streamlit_folium import st_folium
+from utils.data_utils import load_regional_performance_regression, load_regional_performance_classification, load_feature_data
 from utils.visualization_utils import plot_station_map
 import folium
+import os
 
 # Set page configuration
 st.set_page_config(page_title="Regional Analysis Dashboard", layout="centered", initial_sidebar_state="expanded")
@@ -61,7 +63,6 @@ st.markdown("""
         width: 100%;
         box-sizing: border-box;
     }
-    /* Mobile adjustments */
     @media (max-width: 600px) {
         .main {
             padding: 10px;
@@ -92,22 +93,17 @@ with st.container():
     st.title("📍 Regional Analysis Dashboard")
     st.markdown("Explore regression and classification performance across stations with interactive visualizations.")
 
-# Load data functions
-def load_regional_performance_regression():
-    return pd.read_csv('../Rainfall_app/data/regional_performance_regression.csv', index_col='station_id')
-
-def load_regional_performance_classification():
-    return pd.read_csv('../Rainfall_app/data/regional_performance_classification.csv', index_col='station_id')
-
-def load_feature_data():
-    return pd.read_csv('../Rainfall_app/data/feature_engineered_data.csv')
-
 # Load performance data
-reg_perf = load_regional_performance_regression()
-clf_perf = load_regional_performance_classification()
-
-# Load feature data
-feature_data = load_feature_data()
+try:
+    reg_perf = load_regional_performance_regression()
+    clf_perf = load_regional_performance_classification()
+    feature_data = load_feature_data()
+except FileNotFoundError as e:
+    st.error(f"Failed to load data: {str(e)}")
+    st.stop()
+except Exception as e:
+    st.error(f"Error loading data: {str(e)}")
+    st.stop()
 
 # Data Preview Section
 with st.container():
@@ -115,14 +111,20 @@ with st.container():
     st.subheader("📊 Data Preview")
     with st.expander("Feature Data Preview"):
         st.write("Feature Data Preview (before processing):")
-        st.dataframe(feature_data.head()[['station_id', 'station_name_x', 'lat(deg)', 'lon(deg)', 'rainfall_sum']], use_container_width=True)
+        preview_cols = ['station_id', 'station_name_x', 'lat(deg)', 'lon(deg)', 'rainfall_sum']
+        available_cols = [col for col in preview_cols if col in feature_data.columns]
+        if available_cols:
+            st.dataframe(feature_data[available_cols].head(), use_container_width=True)
+        else:
+            st.warning("No preview columns available in feature data.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Locations Data Processing
-if 'station_id' not in feature_data.columns:
+if 'station_id' not in feature_data.columns or 'lat(deg)' not in feature_data.columns or 'lon(deg)' not in feature_data.columns:
     with st.container():
         st.markdown('<div class="card" role="region" aria-label="Error Section">', unsafe_allow_html=True)
-        st.error("station_id column missing in feature_data")
+        missing_cols = [col for col in ['station_id', 'lat(deg)', 'lon(deg)'] if col not in feature_data.columns]
+        st.error(f"Missing required columns in feature_data: {missing_cols}")
         st.write("Feature Data Columns:", feature_data.columns.tolist())
         st.markdown('</div>', unsafe_allow_html=True)
 else:
@@ -134,7 +136,9 @@ else:
         st.subheader("🔍 Debug Information")
         with st.expander("DataFrame Details"):
             st.write("Locations DataFrame Preview:")
-            st.dataframe(locations_df.head()[['station_name_x', 'lat(deg)', 'lon(deg)']], use_container_width=True)
+            preview_cols = ['station_name_x', 'lat(deg)', 'lon(deg)']
+            available_cols = [col for col in preview_cols if col in locations_df.columns]
+            st.dataframe(locations_df[available_cols].head(), use_container_width=True)
             st.write("Regression DataFrame Preview:")
             st.dataframe(reg_perf.head(), use_container_width=True)
             reg_ids = set(reg_perf.index)
@@ -142,6 +146,7 @@ else:
             common_ids = reg_ids.intersection(loc_ids)
             st.write(f"Number of common station_ids: {len(common_ids)}")
             st.write(f"Sample common station_ids: {list(common_ids)[:5]}")
+            st.write(f"Data directory: {os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')}")
         st.markdown('</div>', unsafe_allow_html=True)
 
     # Regression Performance Section
@@ -149,8 +154,14 @@ else:
         st.markdown('<div class="card" role="region" aria-label="Regression Performance Section">', unsafe_allow_html=True)
         st.subheader("📈 Regression Performance by Station")
         if not reg_perf.empty:
-            fig_reg = px.bar(reg_perf.reset_index(), x='station_id', y='R2', title="R2 Score by Station",
-                            color='R2', color_continuous_scale='Blues')
+            fig_reg = px.bar(
+                reg_perf.reset_index(), 
+                x='station_id', 
+                y='R2', 
+                title="R2 Score by Station",
+                color='R2', 
+                color_continuous_scale='Blues'
+            )
             fig_reg.update_layout(
                 font=dict(size=12),
                 xaxis_tickangle=45,
@@ -166,8 +177,14 @@ else:
         st.markdown('<div class="card" role="region" aria-label="Classification Performance Section">', unsafe_allow_html=True)
         st.subheader("📉 Classification Performance by Station")
         if not clf_perf.empty:
-            fig_clf = px.bar(clf_perf.reset_index(), x='station_id', y='F1', title="F1 Score by Station",
-                            color='F1', color_continuous_scale='Blues')
+            fig_clf = px.bar(
+                clf_perf.reset_index(), 
+                x='station_id', 
+                y='F1', 
+                title="F1 Score by Station",
+                color='F1', 
+                color_continuous_scale='Blues'
+            )
             fig_clf.update_layout(
                 font=dict(size=12),
                 xaxis_tickangle=45,
